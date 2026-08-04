@@ -1,1 +1,1211 @@
-من رضا سیفی هستم
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مستر همستر</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0b0e14;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #fff;
+            padding: 12px;
+        }
+        #gameContainer {
+            max-width: 440px;
+            width: 100%;
+            background: linear-gradient(145deg, #141a21, #1a212a);
+            border-radius: 48px 48px 32px 32px;
+            padding: 20px 18px 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+            position: relative;
+            overflow: hidden;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 4px 20px 4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 8px 16px 8px 12px;
+            border-radius: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .avatar {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #f7b731, #f5a623);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(245, 166, 35, 0.3);
+        }
+        .user-name {
+            font-weight: 700;
+            font-size: 15px;
+        }
+        .user-level {
+            font-size: 11px;
+            color: #aaa;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 12px;
+            border-radius: 30px;
+            display: inline-block;
+            margin-top: 2px;
+        }
+        .coin-display {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 18px 8px 14px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            cursor: pointer;
+        }
+        .coin-amount {
+            font-weight: 700;
+            font-size: 20px;
+            color: #ffe484;
+        }
+        .tabs {
+            display: flex;
+            gap: 6px;
+            margin: 16px 0 12px 0;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px;
+            border-radius: 60px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px 8px;
+            border: none;
+            background: transparent;
+            color: #888;
+            font-weight: 600;
+            font-size: 13px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #f5a623, #f7b731);
+            color: #0b0e14;
+            box-shadow: 0 4px 20px rgba(245, 166, 35, 0.3);
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hamster-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 8px 0 6px 0;
+            position: relative;
+        }
+        .hamster-card {
+            background: radial-gradient(circle at 30% 30%, #1f2a33, #12181f);
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 110px;
+            cursor: pointer;
+            transition: all 0.08s ease;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 215, 0, 0.1);
+            position: relative;
+            touch-action: manipulation;
+        }
+        .hamster-card:active {
+            transform: scale(0.90);
+            box-shadow: 0 0 50px rgba(245, 166, 35, 0.25);
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+        .hamster-card .click-amount {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #ffe484;
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            white-space: nowrap;
+            pointer-events: none;
+        }
+        .tap-effect {
+            position: absolute;
+            pointer-events: none;
+            font-weight: 900;
+            font-size: 38px;
+            color: #ffe484;
+            text-shadow: 0 0 20px #f5a623, 0 0 40px #f5a623;
+            animation: floatUp 1s ease-out forwards;
+            z-index: 20;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(0.5); }
+            100% { opacity: 0; transform: translateY(-150px) scale(1.5); }
+        }
+        .energy-bar {
+            margin-top: 14px;
+            width: 100%;
+            max-width: 250px;
+            background: rgba(255, 255, 255, 0.06);
+            height: 10px;
+            border-radius: 30px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .energy-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #f5a623, #ffe484);
+            border-radius: 30px;
+            transition: width 0.2s ease;
+        }
+        .energy-text {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 250px;
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 5px;
+        }
+        .energy-text span:first-child {
+            color: #ffe484;
+        }
+        .auto-click-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 16px;
+            margin: 8px 0;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            flex-wrap: wrap;
+        }
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4caf50;
+            animation: blink 1s infinite;
+        }
+        .status-indicator.off {
+            background: #ff6b6b;
+            animation: none;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .auto-toggle-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 4px 16px;
+            border-radius: 30px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: inherit;
+        }
+        .upgrade-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 16px 0 8px 0;
+        }
+        .upgrade-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 12px 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            color: #ddd;
+            transition: all 0.15s ease;
+        }
+        .upgrade-btn:active {
+            transform: scale(0.94);
+            background: rgba(255, 215, 0, 0.08);
+        }
+        .upgrade-btn .emoji-big {
+            font-size: 26px;
+        }
+        .upgrade-btn .title {
+            font-weight: 600;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+        .upgrade-btn .sub {
+            font-size: 10px;
+            color: #888;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 2px 10px;
+            border-radius: 30px;
+        }
+        .upgrade-btn .price {
+            font-size: 12px;
+            font-weight: 600;
+            color: #ffe484;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 2px 12px;
+            border-radius: 30px;
+            margin-top: 2px;
+        }
+        .bank-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 24px;
+            padding: 18px;
+            margin: 12px 0;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .bank-section h3 {
+            font-size: 16px;
+            margin-bottom: 14px;
+            color: #ffe484;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .bank-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .bank-input-group input {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 12px 16px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            font-family: inherit;
+        }
+        .bank-input-group input:focus {
+            border-color: #f5a623;
+        }
+        .bank-input-group input::placeholder {
+            color: #666;
+        }
+        .bank-btn {
+            background: linear-gradient(135deg, #f5a623, #f7b731);
+            border: none;
+            padding: 12px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 14px;
+            color: #0b0e14;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        .bank-btn:active {
+            transform: scale(0.95);
+        }
+        .bank-btn.secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .bank-code-display {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 14px;
+            border-radius: 16px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #ffe484;
+            border: 1px dashed rgba(255, 215, 0, 0.2);
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            word-break: break-all;
+        }
+        .bank-code-display .copy-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            padding: 6px 14px;
+            border-radius: 12px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .bank-history {
+            max-height: 120px;
+            overflow-y: auto;
+            font-size: 12px;
+            color: #888;
+            margin-top: 10px;
+        }
+        .bank-history-item {
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            display: flex;
+            justify-content: space-between;
+        }
+        .bank-history-item .positive {
+            color: #4caf50;
+        }
+        .bank-history-item .negative {
+            color: #ff6b6b;
+        }
+        .bank-account-display {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #aaa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .bank-account-display .acc-number {
+            color: #fff;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        .missions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 12px 0;
+        }
+        .mission-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 14px 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .mission-card.done {
+            opacity: 0.4;
+            border-color: #4caf50;
+        }
+        .mission-card .emoji {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .mission-card .desc {
+            font-size: 12px;
+            color: #aaa;
+        }
+        .mission-card .reward {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffe484;
+            margin-top: 4px;
+        }
+        .mission-btn {
+            background: linear-gradient(135deg, #f5a623, #f7b731);
+            border: none;
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #0b0e14;
+            cursor: pointer;
+            margin-top: 6px;
+            font-family: inherit;
+        }
+        .mission-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .footer-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 12px;
+            color: #aaa;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px 12px;
+            border-radius: 40px;
+        }
+        .stat-item span:last-child {
+            font-weight: 600;
+            color: #eee;
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a212a;
+            padding: 12px 24px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            color: #fff;
+            font-size: 14px;
+            z-index: 999;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            max-width: 90%;
+            text-align: center;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(30px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        @media (max-width: 420px) {
+            .hamster-card { width: 190px; height: 190px; font-size: 90px; }
+            .hamster-card .click-amount { font-size: 11px; padding: 3px 12px; bottom: 20px; }
+        }
+        @media (max-width: 360px) {
+            .hamster-card { width: 160px; height: 160px; font-size: 75px; }
+            .hamster-card .click-amount { font-size: 10px; padding: 2px 10px; bottom: 16px; }
+            .upgrade-grid { gap: 6px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="gameContainer">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="user-badge">
+                <div class="avatar">🐹</div>
+                <div>
+                    <div class="user-name">مستر همستر</div>
+                    <div class="user-level">⬆️ سطح <span id="userLevel">۱</span></div>
+                </div>
+            </div>
+            <div class="coin-display" onclick="copyAccountNumber()">
+                <span>🪙</span>
+                <span class="coin-amount" id="coinCounter">100</span>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="main" onclick="switchTab('main')">🏠 اصلی</button>
+            <button class="tab-btn" data-tab="bank" onclick="switchTab('bank')">🏦 بانک</button>
+            <button class="tab-btn" data-tab="missions" onclick="switchTab('missions')">🎯 ماموریت</button>
+        </div>
+
+        <!-- PAGE: MAIN -->
+        <div class="page active" id="page-main">
+            <div class="hamster-area">
+                <div class="hamster-card" id="hamsterBtn">
+                    🐹
+                    <div class="click-amount" id="clickAmount">+۱ 🪙</div>
+                </div>
+                <div class="energy-bar">
+                    <div class="energy-fill" id="energyFill" style="width: 100%;"></div>
+                </div>
+                <div class="energy-text">
+                    <span>⚡ انرژی</span>
+                    <span id="energyLabel">100 / 100</span>
+                </div>
+            </div>
+
+            <div class="auto-click-status">
+                <div class="status-indicator off" id="autoIndicator"></div>
+                <span>کلیک خودکار</span>
+                <button class="auto-toggle-btn" id="autoToggle" onclick="toggleAutoClick()">فعال کن</button>
+                <span style="font-size:11px;color:#888;">(۱/ثانیه)</span>
+            </div>
+
+            <div class="upgrade-grid">
+                <div class="upgrade-btn" id="upgradeClickBtn">
+                    <span class="emoji-big">💥</span>
+                    <span class="title">قدرت کلیک</span>
+                    <span class="sub">+۱ سکه</span>
+                    <span class="price" id="clickPrice">🪙 ۱۰</span>
+                </div>
+                <div class="upgrade-btn" id="upgradeEnergyBtn">
+                    <span class="emoji-big">🔋</span>
+                    <span class="title">شارژ انرژی</span>
+                    <span class="sub">+۲۰ ظرفیت</span>
+                    <span class="price" id="energyPrice">🪙 ۲۵</span>
+                </div>
+                <div class="upgrade-btn" id="upgradePassiveBtn">
+                    <span class="emoji-big">⏳</span>
+                    <span class="title">ماینر غیرفعال</span>
+                    <span class="sub">هر ۳ ثانیه</span>
+                    <span class="price" id="passivePrice">🪙 ۴۰</span>
+                </div>
+                <div class="upgrade-btn" id="upgradeMultiBtn">
+                    <span class="emoji-big">✨</span>
+                    <span class="title">چند کلیک</span>
+                    <span class="sub">x۲ سکه</span>
+                    <span class="price" id="multiPrice">🪙 ۷۰</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE: BANK -->
+        <div class="page" id="page-bank">
+            <div class="bank-section">
+                <h3>🏦 حساب من</h3>
+                <div class="bank-account-display">
+                    <span>شماره حساب:</span>
+                    <span class="acc-number" id="accountNumber">HAM-1234-5678</span>
+                    <button class="bank-btn secondary" style="padding:4px 12px;font-size:11px;" onclick="copyAccountNumber()">📋 کپی</button>
+                </div>
+                <div style="display:flex;gap:8px;margin-bottom:12px;">
+                    <button class="bank-btn" style="flex:1;" onclick="showTransfer()">📤 انتقال</button>
+                    <button class="bank-btn secondary" style="flex:1;" onclick="showReceive()">📥 دریافت</button>
+                </div>
+            </div>
+
+            <div class="bank-section" id="transferSection" style="display:none;">
+                <h3>📤 انتقال کوین</h3>
+                <div class="bank-input-group">
+                    <input type="text" id="transferAccount" placeholder="شماره حساب مقصد" maxlength="14">
+                    <input type="number" id="transferAmount" placeholder="تعداد کوین" min="1">
+                    <div style="font-size:12px;color:#888;text-align:center;">💰 مالیات: ۲ کوین + ۵٪</div>
+                    <button class="bank-btn" onclick="processTransfer()">تایید انتقال</button>
+                </div>
+            </div>
+
+            <div class="bank-section" id="receiveSection" style="display:none;">
+                <h3>📥 دریافت با کد</h3>
+                <div class="bank-input-group">
+                    <input type="text" id="receiveCode" placeholder="کد دریافت را وارد کنید" style="text-transform:uppercase;letter-spacing:2px;">
+                    <button class="bank-btn" onclick="processReceive()">دریافت</button>
+                </div>
+            </div>
+
+            <div class="bank-section" id="codeDisplay" style="display:none;">
+                <h3>🔑 کد انتقال</h3>
+                <div class="bank-code-display">
+                    <span id="generatedCode">----</span>
+                    <button class="copy-btn" onclick="copyGeneratedCode()">📋 کپی</button>
+                </div>
+                <div style="font-size:12px;color:#888;text-align:center;">این کد یکبار مصرف است</div>
+            </div>
+
+            <div class="bank-section">
+                <h3>📜 تاریخچه</h3>
+                <div class="bank-history" id="bankHistory">
+                    <div style="color:#666;text-align:center;padding:10px;">هنوز تراکنشی انجام نشده</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE: MISSIONS -->
+        <div class="page" id="page-missions">
+            <h3 style="color:#ffe484;margin-bottom:12px;">🎯 ماموریت‌های روزانه</h3>
+            <div class="missions-grid" id="missionsContainer"></div>
+        </div>
+
+        <div class="footer-stats">
+            <div class="stat-item">⚡ <span id="clickPower">۱</span></div>
+            <div class="stat-item">⏳ <span id="passiveIncome">۰</span>/ثانیه</div>
+            <div class="stat-item">🏆 <span id="totalClicks">۰</span></div>
+            <div class="stat-item">👥 <span id="userLevelFooter">۱</span></div>
+        </div>
+    </div>
+
+    <script>
+        // =============================================
+        // STATE
+        // =============================================
+        let state = {
+            coins: 100,
+            energy: 100,
+            maxEnergy: 100,
+            clickPower: 1,
+            passiveIncome: 0,
+            multiClick: 1,
+            totalClicks: 0,
+            clickLevel: 0,
+            energyLevel: 0,
+            passiveLevel: 0,
+            multiLevel: 0,
+            accountNumber: 'HAM-' + String(Math.floor(1000 + Math.random() * 9000)) + '-' + String(Math.floor(1000 + Math
+                .random() * 9000)),
+            bankHistory: [],
+            missions: {
+                clicks: { done: false, target: 100, reward: 50 },
+                coins: { done: false, target: 500, reward: 100 },
+                upgrade: { done: false, target: 10, reward: 75 },
+                clicks2: { done: false, target: 500, reward: 150 },
+                coins2: { done: false, target: 2000, reward: 300 },
+                upgrade2: { done: false, target: 25, reward: 200 }
+            },
+            autoClickEnabled: false,
+            autoClickInterval: null,
+        };
+
+        // =============================================
+        // PRICES
+        // =============================================
+        function getClickPrice(l) { return 10 + l * 8; }
+
+        function getEnergyPrice(l) { return 25 + l * 15; }
+
+        function getPassivePrice(l) { return 40 + l * 22; }
+
+        function getMultiPrice(l) { return 70 + l * 40; }
+
+        // =============================================
+        // TOAST
+        // =============================================
+        function showToast(msg) {
+            const old = document.querySelector('.toast');
+            if (old) old.remove();
+            const el = document.createElement('div');
+            el.className = 'toast';
+            el.innerText = msg;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 3000);
+        }
+
+        // =============================================
+        // UI UPDATE
+        // =============================================
+        function updateUI() {
+            document.getElementById('coinCounter').innerText = Math.floor(state.coins);
+            document.getElementById('energyFill').style.width = (state.energy / state.maxEnergy * 100) + '%';
+            document.getElementById('energyLabel').innerText = `${Math.floor(state.energy)} / ${state.maxEnergy}`;
+            const totalPower = state.clickPower * state.multiClick;
+            document.getElementById('clickPower').innerText = totalPower;
+            document.getElementById('passiveIncome').innerText = (state.passiveIncome * state.multiClick).toFixed(1);
+            document.getElementById('totalClicks').innerText = state.totalClicks;
+
+            document.getElementById('clickAmount').innerHTML = `+${totalPower} 🪙`;
+
+            const level = Math.floor(state.totalClicks / 100) + 1;
+            document.getElementById('userLevel').innerText = level;
+            document.getElementById('userLevelFooter').innerText = level;
+
+            document.getElementById('clickPrice').innerHTML = `🪙 ${getClickPrice(state.clickLevel)}`;
+            document.getElementById('energyPrice').innerHTML = `🪙 ${getEnergyPrice(state.energyLevel)}`;
+            document.getElementById('passivePrice').innerHTML = `🪙 ${getPassivePrice(state.passiveLevel)}`;
+            document.getElementById('multiPrice').innerHTML = `🪙 ${getMultiPrice(state.multiLevel)}`;
+
+            document.getElementById('accountNumber').innerText = state.accountNumber;
+            updateMissions();
+            updateHistory();
+            saveState();
+        }
+
+        function updateHistory() {
+            const container = document.getElementById('bankHistory');
+            if (state.bankHistory.length === 0) {
+                container.innerHTML = '<div style="color:#666;text-align:center;padding:10px;">هنوز تراکنشی انجام نشده</div>';
+                return;
+            }
+            container.innerHTML = state.bankHistory.slice(-10).reverse().map(item => {
+                const cls = item.amount > 0 ? 'positive' : 'negative';
+                return `<div class="bank-history-item">
+                            <span>${item.text}</span>
+                            <span class="${cls}">${item.amount > 0 ? '+' : ''}${item.amount.toFixed(1)} 🪙</span>
+                        </div>`;
+            }).join('');
+        }
+
+        function updateMissions() {
+            const container = document.getElementById('missionsContainer');
+            const m = state.missions;
+            const missionsList = [
+                { id: 'clicks', emoji: '👆', desc: `${m.clicks.target} کلیک`, reward: m.clicks.reward, done: m.clicks
+                        .done, progress: Math.min(state.totalClicks, m.clicks.target) },
+                { id: 'coins', emoji: '💰', desc: `${m.coins.target} سکه جمع کن`, reward: m.coins.reward, done: m.coins
+                        .done, progress: Math.min(state.coins, m.coins.target) },
+                { id: 'upgrade', emoji: '⬆️', desc: `${m.upgrade.target} ارتقا بخر`, reward: m.upgrade.reward, done: m
+                        .upgrade.done, progress: Math.min(state.clickLevel + state.energyLevel + state.passiveLevel +
+                        state.multiLevel, m.upgrade.target) },
+                { id: 'clicks2', emoji: '🦾', desc: `${m.clicks2.target} کلیک`, reward: m.clicks2.reward, done: m
+                        .clicks2.done, progress: Math.min(state.totalClicks, m.clicks2.target) },
+                { id: 'coins2', emoji: '💎', desc: `${m.coins2.target} سکه جمع کن`, reward: m.coins2.reward, done: m
+                        .coins2.done, progress: Math.min(state.coins, m.coins2.target) },
+                { id: 'upgrade2', emoji: '🚀', desc: `${m.upgrade2.target} ارتقا بخر`, reward: m.upgrade2.reward,
+                    done: m.upgrade2.done, progress: Math.min(state.clickLevel + state.energyLevel + state
+                        .passiveLevel + state.multiLevel, m.upgrade2.target) }
+            ];
+
+            container.innerHTML = missionsList.map(mission => {
+                const done = mission.done;
+                const target = parseInt(mission.desc.split(' ')[0]);
+                const progressPercent = Math.min((mission.progress / target) * 100, 100);
+                return `
+                            <div class="mission-card ${done ? 'done' : ''}">
+                                <span class="emoji">${mission.emoji}</span>
+                                <div class="desc">${mission.desc}</div>
+                                <div style="font-size:10px;color:#666;margin:2px 0;">${mission.progress}/${target}</div>
+                                <div style="width:100%;height:3px;background:#333;border-radius:10px;overflow:hidden;">
+                                    <div style="width:${progressPercent}%;height:100%;background:#f5a623;border-radius:10px;"></div>
+                                </div>
+                                <div class="reward">💰 ${mission.reward} سکه</div>
+                                <button class="mission-btn" ${done ? 'disabled' : ''} onclick="claimMission('${mission.id}')">
+                                    ${done ? '✅ انجام شد' : 'دریافت'}
+                                </button>
+                            </div>
+                        `;
+            }).join('');
+        }
+
+        // =============================================
+        // MISSIONS
+        // =============================================
+        function claimMission(id) {
+            const m = state.missions[id];
+            if (m.done) return;
+
+            let progress = 0;
+            if (id === 'clicks' || id === 'clicks2') progress = state.totalClicks;
+            else if (id === 'coins' || id === 'coins2') progress = state.coins;
+            else if (id === 'upgrade' || id === 'upgrade2') progress = state.clickLevel + state.energyLevel + state
+                .passiveLevel + state.multiLevel;
+
+            if (progress >= m.target) {
+                m.done = true;
+                state.coins += m.reward;
+                state.bankHistory.push({ text: `🎯 ماموریت "${id}"`, amount: m.reward });
+                showToast(`✅ ماموریت کامل شد! +${m.reward} سکه`);
+                updateUI();
+            } else {
+                showToast(`⏳ هنوز کامل نشده (${progress}/${m.target})`);
+            }
+        }
+
+        // =============================================
+        // HAMSTER CLICK
+        // =============================================
+        function handleHamsterClick(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            if (state.energy < 1) {
+                showToast('⚡ انرژی کافی نیست! صبر کن');
+                return;
+            }
+
+            state.energy = Math.max(0, state.energy - 1);
+            const earned = state.clickPower * state.multiClick;
+            state.coins += earned;
+            state.totalClicks++;
+
+            // Tap effect
+            const el = document.createElement('div');
+            el.className = 'tap-effect';
+            el.innerText = `+${earned} 🪙`;
+            const hamster = document.getElementById('hamsterBtn');
+            const rect = hamster.getBoundingClientRect();
+            let x = (e && e.clientX) ? e.clientX - rect.left : rect.width / 2;
+            let y = (e && e.clientY) ? e.clientY - rect.top : rect.height / 2;
+            x += (Math.random() - 0.5) * 30;
+            y += (Math.random() - 0.5) * 30;
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            el.style.position = 'absolute';
+            document.querySelector('.hamster-area').appendChild(el);
+            setTimeout(() => el.remove(), 1000);
+
+            updateUI();
+            saveState();
+
+            const btn = document.getElementById('hamsterBtn');
+            btn.style.transform = 'scale(0.85)';
+            setTimeout(() => {
+                btn.style.transform = 'scale(1)';
+            }, 120);
+        }
+
+        // =============================================
+        // AUTO CLICK
+        // =============================================
+        function toggleAutoClick() {
+            state.autoClickEnabled = !state.autoClickEnabled;
+            if (state.autoClickEnabled) {
+                state.autoClickInterval = setInterval(() => {
+                    if (state.energy > 0) {
+                        const earned = state.clickPower * state.multiClick;
+                        state.coins += earned;
+                        state.totalClicks++;
+                        state.energy = Math.max(0, state.energy - 1);
+                        updateUI();
+                        saveState();
+                    }
+                }, 1000);
+                document.getElementById('autoToggle').innerText = 'غیرفعال کن';
+                document.getElementById('autoIndicator').className = 'status-indicator';
+                showToast('🤖 کلیک خودکار فعال شد');
+            } else {
+                clearInterval(state.autoClickInterval);
+                document.getElementById('autoToggle').innerText = 'فعال کن';
+                document.getElementById('autoIndicator').className = 'status-indicator off';
+                showToast('⏹ کلیک خودکار غیرفعال شد');
+            }
+            updateUI();
+        }
+
+        // =============================================
+        // UPGRADES - با addEventListener
+        // =============================================
+        function upgradeClick() {
+            const price = getClickPrice(state.clickLevel);
+            if (state.coins < price) { showToast('❌ سکه کافی نیست'); return; }
+            state.coins -= price;
+            state.clickLevel++;
+            state.clickPower = 1 + state.clickLevel * 1;
+            updateUI();
+            saveState();
+            showToast(`⬆️ قدرت کلیک به ${state.clickPower} افزایش یافت`);
+        }
+
+        function upgradeEnergy() {
+            const price = getEnergyPrice(state.energyLevel);
+            if (state.coins < price) { showToast('❌ سکه کافی نیست'); return; }
+            state.coins -= price;
+            state.energyLevel++;
+            state.maxEnergy = 100 + state.energyLevel * 20;
+            state.energy = Math.min(state.energy + 20, state.maxEnergy);
+            updateUI();
+            saveState();
+            showToast(`🔋 انرژی به ${state.maxEnergy} افزایش یافت`);
+        }
+
+        function upgradePassive() {
+            const price = getPassivePrice(state.passiveLevel);
+            if (state.coins < price) { showToast('❌ سکه کافی نیست'); return; }
+            state.coins -= price;
+            state.passiveLevel++;
+            state.passiveIncome = state.passiveLevel * 0.5;
+            updateUI();
+            saveState();
+            showToast(`⏳ ماینر غیرفعال: ${state.passiveIncome.toFixed(1)}/ثانیه`);
+        }
+
+        function upgradeMulti() {
+            const price = getMultiPrice(state.multiLevel);
+            if (state.coins < price) { showToast('❌ سکه کافی نیست'); return; }
+            state.coins -= price;
+            state.multiLevel++;
+            state.multiClick = 1 + state.multiLevel * 1;
+            updateUI();
+            saveState();
+            showToast(`✨ ضریب کلیک: x${state.multiClick}`);
+        }
+
+        // =============================================
+        // BANK
+        // =============================================
+        function showTransfer() {
+            document.getElementById('transferSection').style.display = 'block';
+            document.getElementById('receiveSection').style.display = 'none';
+            document.getElementById('codeDisplay').style.display = 'none';
+        }
+
+        function showReceive() {
+            document.getElementById('receiveSection').style.display = 'block';
+            document.getElementById('transferSection').style.display = 'none';
+            document.getElementById('codeDisplay').style.display = 'none';
+        }
+
+        function processTransfer() {
+            const acc = document.getElementById('transferAccount').value.trim();
+            const amount = parseFloat(document.getElementById('transferAmount').value);
+
+            if (!acc || acc.length < 4) {
+                showToast('❌ شماره حساب معتبر نیست');
+                return;
+            }
+            if (!amount || amount < 1) {
+                showToast('❌ تعداد کوین معتبر نیست');
+                return;
+            }
+
+            const tax = 2;
+            const fee = Math.ceil(amount * 0.05);
+            const total = amount + tax + fee;
+
+            if (state.coins < total) {
+                showToast(`❌ موجودی کافی نیست! نیاز: ${total}`);
+                return;
+            }
+
+            state.coins -= total;
+
+            const code = 'H' + Math.random().toString(36).substring(2, 9).toUpperCase();
+
+            const transferData = {
+                code: code,
+                receiver: acc,
+                amount: amount,
+                sender: state.accountNumber,
+                used: false
+            };
+
+            let pending = JSON.parse(localStorage.getItem('pendingTransfers') || '[]');
+            pending.push(transferData);
+            localStorage.setItem('pendingTransfers', JSON.stringify(pending));
+
+            state.bankHistory.push({ text: `📤 انتقال به ${acc}`, amount: -total });
+
+            document.getElementById('generatedCode').innerText = code;
+            document.getElementById('codeDisplay').style.display = 'block';
+
+            showToast(`✅ انتقال انجام شد! کد: ${code}`);
+            document.getElementById('transferAmount').value = '';
+            document.getElementById('transferAccount').value = '';
+            updateUI();
+        }
+
+        function processReceive() {
+            const code = document.getElementById('receiveCode').value.trim().toUpperCase();
+            if (!code) {
+                showToast('❌ کد را وارد کن');
+                return;
+            }
+
+            let pending = JSON.parse(localStorage.getItem('pendingTransfers') || '[]');
+            const index = pending.findIndex(t => t.code === code && !t.used);
+
+            if (index === -1) {
+                showToast('❌ کد نامعتبر یا قبلاً استفاده شده');
+                return;
+            }
+
+            const transfer = pending[index];
+
+            if (transfer.receiver !== state.accountNumber) {
+                showToast('❌ این کد برای شماره حساب شما نیست');
+                return;
+            }
+
+            transfer.used = true;
+            pending[index] = transfer;
+            localStorage.setItem('pendingTransfers', JSON.stringify(pending));
+
+            state.coins += transfer.amount;
+            state.bankHistory.push({ text: `📥 دریافت از ${transfer.sender}`, amount: transfer.amount });
+
+            document.getElementById('receiveCode').value = '';
+            showToast(`✅ ${transfer.amount} سکه دریافت شد!`);
+            updateUI();
+        }
+
+        // =============================================
+        // COPY
+        // =============================================
+        function copyAccountNumber() {
+            navigator.clipboard.writeText(state.accountNumber).then(() => {
+                showToast('📋 شماره حساب کپی شد');
+            }).catch(() => {
+                const el = document.createElement('textarea');
+                el.value = state.accountNumber;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                el.remove();
+                showToast('📋 شماره حساب کپی شد');
+            });
+        }
+
+        function copyGeneratedCode() {
+            const code = document.getElementById('generatedCode').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                showToast('📋 کد کپی شد');
+            }).catch(() => {
+                const el = document.createElement('textarea');
+                el.value = code;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                el.remove();
+                showToast('📋 کد کپی شد');
+            });
+        }
+
+        // =============================================
+        // TABS
+        // =============================================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + tab).classList.add('active');
+
+            if (tab !== 'bank') {
+                document.getElementById('transferSection').style.display = 'none';
+                document.getElementById('receiveSection').style.display = 'none';
+                document.getElementById('codeDisplay').style.display = 'none';
+            }
+        }
+
+        // =============================================
+        // SAVE / LOAD
+        // =============================================
+        function saveState() {
+            try {
+                const data = { ...state };
+                delete data.autoClickInterval;
+                localStorage.setItem('hamsterProState', JSON.stringify(data));
+            } catch (e) {}
+        }
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem('hamsterProState');
+                if (raw) {
+                    const saved = JSON.parse(raw);
+                    state = { ...state, ...saved };
+                    state.maxEnergy = 100 + state.energyLevel * 20;
+                    if (state.energy > state.maxEnergy) state.energy = state.maxEnergy;
+                    state.passiveIncome = state.passiveLevel * 0.5;
+                    state.clickPower = 1 + state.clickLevel * 1;
+                    state.multiClick = 1 + state.multiLevel * 1;
+                }
+            } catch (e) {}
+            updateUI();
+        }
+
+        // =============================================
+        // ENERGY REGEN
+        // =============================================
+        function startEnergyRegen() {
+            setInterval(() => {
+                if (state.energy < state.maxEnergy) {
+                    state.energy = Math.min(state.maxEnergy, state.energy + 1);
+                    updateUI();
+                    saveState();
+                }
+            }, 3000);
+        }
+
+        // =============================================
+        // PASSIVE INCOME
+        // =============================================
+        function startPassiveIncome() {
+            setInterval(() => {
+                if (state.passiveIncome > 0 && state.energy > 0) {
+                    const earn = state.passiveIncome * state.multiClick;
+                    state.coins += earn;
+                    updateUI();
+                    saveState();
+                }
+            }, 3000);
+        }
+
+        // =============================================
+        // INIT
+        // =============================================
+        function init() {
+            loadState();
+
+            // Hamster click
+            const hamster = document.getElementById('hamsterBtn');
+            hamster.addEventListener('click', handleHamsterClick);
+            hamster.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                handleHamsterClick(e);
+            }, { passive: false });
+
+            // Upgrade buttons - با addEventListener درست شد
+            document.getElementById('upgradeClickBtn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                upgradeClick();
+            });
+            document.getElementById('upgradeEnergyBtn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                upgradeEnergy();
+            });
+            document.getElementById('upgradePassiveBtn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                upgradePassive();
+            });
+            document.getElementById('upgradeMultiBtn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                upgradeMulti();
+            });
+
+            startEnergyRegen();
+            startPassiveIncome();
+
+            document.getElementById('autoIndicator').className = 'status-indicator off';
+            updateUI();
+            showToast('🐹 به مستر همستر خوش اومدی!');
+        }
+
+        // =============================================
+        // GLOBAL EXPOSURE برای onclick
+        // =============================================
+        window.upgradeClick = upgradeClick;
+        window.upgradeEnergy = upgradeEnergy;
+        window.upgradePassive = upgradePassive;
+        window.upgradeMulti = upgradeMulti;
+        window.toggleAutoClick = toggleAutoClick;
+        window.processTransfer = processTransfer;
+        window.processReceive = processReceive;
+        window.showTransfer = showTransfer;
+        window.showReceive = showReceive;
+        window.copyAccountNumber = copyAccountNumber;
+        window.copyGeneratedCode = copyGeneratedCode;
+        window.claimMission = claimMission;
+        window.switchTab = switchTab;
+
+        document.addEventListener('touchstart', function() {}, { passive: true });
+
+        init();
+    </script>
+
+</body>
+</html>
