@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت فایل reza.all - سه‌بعدی</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            direction: rtl;
+            padding: 20px;
+            perspective: 1200px;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 32px;
+            padding: 2.5rem;
+            max-width: 750px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 
+                0 30px 80px rgba(0, 0, 0, 0.6),
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+            transform: rotateX(2deg) rotateY(-1deg) translateZ(20px);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: rotateX(2deg) rotateY(-1deg) translateZ(20px) translateY(0px); }
+            50% { transform: rotateX(2deg) rotateY(-1deg) translateZ(30px) translateY(-10px); }
+        }
+        
+        .container:hover {
+            transform: rotateX(0deg) rotateY(0deg) translateZ(40px) scale(1.01);
+            box-shadow: 
+                0 40px 100px rgba(0, 0, 0, 0.7),
+                0 0 0 2px rgba(255, 255, 255, 0.1) inset;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.8rem;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .file-name {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 0.5rem 1.4rem;
+            border-radius: 60px;
+            font-weight: 700;
+            color: #e0e7ff;
+            font-size: 1.2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: glowPulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.2); }
+            50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.5); }
+        }
+        
+        .file-name .icon {
+            font-size: 1.4rem;
+        }
+        
+        .file-name .badge {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 0.1rem 0.9rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #a5b4fc;
+            font-size: 0.85rem;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: dotPulse 2s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
+        }
+        
+        @keyframes dotPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+        }
+        
+        .textarea-wrapper {
+            position: relative;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s ease;
+        }
+        
+        .textarea-wrapper:focus-within {
+            box-shadow: 0 8px 40px rgba(99, 102, 241, 0.3);
+            transform: scale(1.01);
+        }
+        
+        textarea {
+            width: 100%;
+            height: 260px;
+            padding: 1.2rem;
+            border: none;
+            border-radius: 18px;
+            font-size: 1rem;
+            line-height: 1.9;
+            resize: vertical;
+            background: rgba(15, 23, 42, 0.8);
+            color: #e2e8f0;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        textarea:focus {
+            outline: none;
+            background: rgba(15, 23, 42, 0.95);
+            box-shadow: inset 0 0 30px rgba(99, 102, 241, 0.05);
+        }
+        
+        textarea::placeholder {
+            color: #64748b;
+        }
+        
+        .glow-border {
+            position: absolute;
+            inset: -2px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899, #6366f1);
+            background-size: 300% 300%;
+            z-index: -1;
+            animation: borderGlow 4s ease-in-out infinite;
+            opacity: 0.5;
+            transition: opacity 0.5s;
+        }
+        
+        .textarea-wrapper:focus-within .glow-border {
+            opacity: 1;
+            animation-duration: 2s;
+        }
+        
+        @keyframes borderGlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 14px;
+            margin-top: 1.8rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 130px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        
+        .btn:hover::before {
+            opacity: 1;
+        }
+        
+        .btn-copy {
+            background: linear-gradient(135deg, #0b3b5c, #1a5a7a);
+            color: white;
+            box-shadow: 0 8px 25px rgba(11, 59, 92, 0.4);
+        }
+        
+        .btn-copy:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(11, 59, 92, 0.6);
+        }
+        
+        .btn-copy:active {
+            transform: scale(0.95) translateY(0);
+        }
+        
+        .btn-save {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+            box-shadow: 0 8px 25px rgba(22, 163, 74, 0.4);
+        }
+        
+        .btn-save:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(22, 163, 74, 0.6);
+        }
+        
+        .btn-save:active {
+            transform: scale(0.95) translateY(0);
+        }
+        
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.08);
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-reset:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-reset:active {
+            transform: scale(0.95) translateY(0);
+        }
+        
+        .btn-success-anim {
+            animation: successPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        @keyframes successPop {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.15); }
+            60% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+        
+        .feedback {
+            margin-top: 1.2rem;
+            font-weight: 600;
+            min-height: 2.2rem;
+            text-align: center;
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+            border-radius: 60px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.5s ease;
+        }
+        
+        .feedback.success {
+            color: #4ade80;
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+            animation: feedbackSlide 0.5s ease;
+        }
+        
+        .feedback.error {
+            color: #f87171;
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+            animation: feedbackSlide 0.5s ease;
+        }
+        
+        @keyframes feedbackSlide {
+            0% { transform: translateY(-10px) scale(0.95); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        
+        .footer {
+            margin-top: 1.8rem;
+            font-size: 0.75rem;
+            color: rgba(148, 163, 184, 0.5);
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 1.2rem;
+            letter-spacing: 0.3px;
+        }
+        
+        .footer span {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+        }
+        
+        /* 3D particle effect on textarea */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFloat 8s infinite linear;
+        }
+        
+        @keyframes particleFloat {
+            0% { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) translateX(20px) scale(0); opacity: 0; }
+        }
+        
+        @media (max-width: 600px) {
+            .container { padding: 1.5rem; }
+            .btn { min-width: 100px; padding: 0.7rem 1.2rem; font-size: 0.9rem; }
+            .file-name { font-size: 1rem; padding: 0.4rem 1rem; }
+            textarea { height: 200px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- هدر -->
+    <div class="header">
+        <div class="file-name">
+            <span class="icon">📄</span>
+            reza.all
+            <span class="badge">متن</span>
+        </div>
+        <div class="status-indicator">
+            <span class="status-dot"></span>
+            <span>فعال</span>
+        </div>
+    </div>
+
+    <!-- تکست‌آریا با افکت سه‌بعدی -->
+    <div class="textarea-wrapper">
+        <div class="glow-border"></div>
+        <textarea id="fileContent" spellcheck="false">سلام! این محتوای فایل reza.all است.
+این متن را می‌توانید ویرایش کنید.
+هر تغییری که بدهید با دکمه "ذخیره" اعمال می‌شود.
+— 
+کپی با دکمه پایین انجام می‌شود.</textarea>
+        
+        <!-- ذرات پس‌زمینه -->
+        <div class="particle" style="left:10%; animation-delay:0s;"></div>
+        <div class="particle" style="left:30%; animation-delay:2s;"></div>
+        <div class="particle" style="left:60%; animation-delay:4s;"></div>
+        <div class="particle" style="left:80%; animation-delay:1s;"></div>
+        <div class="particle" style="left:50%; animation-delay:3s;"></div>
+    </div>
+
+    <!-- دکمه‌ها -->
+    <div class="button-group">
+        <button class="btn btn-copy" id="copyBtn">📋 کپی متن</button>
+        <button class="btn btn-save" id="saveBtn">💾 ذخیره</button>
+        <button class="btn btn-reset" id="resetBtn">↺ بازنشانی</button>
+    </div>
+
+    <!-- پیام وضعیت -->
+    <div id="feedback" class="feedback"></div>
+    <div class="footer">
+        <span>⚡ فایل reza.all · ویرایش و کپی سه‌بعدی</span>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const textarea = document.getElementById('fileContent');
+        const copyBtn = document.getElementById('copyBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const feedback = document.getElementById('feedback');
+
+        const DEFAULT_TEXT = `سلام! این محتوای فایل reza.all است.
+این متن را می‌توانید ویرایش کنید.
+هر تغییری که بدهید با دکمه "ذخیره" اعمال می‌شود.
+— 
+کپی با دکمه پایین انجام می‌شود.`;
+
+        function showMessage(msg, isError = false) {
+            feedback.textContent = msg;
+            feedback.className = 'feedback';
+            if (isError) {
+                feedback.classList.add('error');
+            } else {
+                feedback.classList.add('success');
+            }
+            
+            clearTimeout(window.msgTimeout);
+            window.msgTimeout = setTimeout(() => {
+                if (feedback.textContent === msg) {
+                    feedback.textContent = '';
+                    feedback.className = 'feedback';
+                }
+            }, 3000);
+        }
+
+        function animateButton(btn) {
+            btn.classList.remove('btn-success-anim');
+            void btn.offsetWidth;
+            btn.classList.add('btn-success-anim');
+        }
+
+        function copyText() {
+            const text = textarea.value;
+            if (!text || text.trim() === '') {
+                showMessage('⚠️ متنی برای کپی وجود ندارد!', true);
+                return;
+            }
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        showMessage('✅ متن با موفقیت کپی شد!');
+                        animateButton(copyBtn);
+                        copyBtn.style.background = 'linear-gradient(135deg, #1f8b4c, #22c55e)';
+                        setTimeout(() => {
+                            copyBtn.style.background = '';
+                        }, 800);
+                    })
+                    .catch(() => fallbackCopy(text));
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const temp = document.createElement('textarea');
+            temp.value = text;
+            temp.setAttribute('readonly', '');
+            temp.style.position = 'fixed';
+            temp.style.left = '-9999px';
+            temp.style.top = '0';
+            document.body.appendChild(temp);
+            try {
+                temp.select();
+                temp.setSelectionRange(0, text.length);
+                const success = document.execCommand('copy');
+                if (success) {
+                    showMessage('✅ متن کپی شد');
+                    animateButton(copyBtn);
+                } else {
+                    showMessage('❌ کپی نشد. متن را دستی کپی کنید.', true);
+                }
+            } catch (e) {
+                showMessage('❌ خطا در کپی', true);
+            } finally {
+                document.body.removeChild(temp);
+            }
+        }
+
+        function saveChanges() {
+            try {
+                localStorage.setItem('reza_all_content', textarea.value);
+                showMessage('💾 تغییرات ذخیره شد');
+                animateButton(saveBtn);
+                saveBtn.style.background = 'linear-gradient(135deg, #15803d, #22c55e)';
+                setTimeout(() => {
+                    saveBtn.style.background = '';
+                }, 800);
+            } catch (e) {
+                showMessage('❌ خطا در ذخیره', true);
+            }
+        }
+
+        function resetToDefault() {
+            textarea.value = DEFAULT_TEXT;
+            showMessage('↺ متن به حالت اولیه بازگشت');
+            animateButton(resetBtn);
+            try {
+                localStorage.removeItem('reza_all_content');
+            } catch (e) { /* ignore */ }
+        }
+
+        function loadSavedContent() {
+            try {
+                const saved = localStorage.getItem('reza_all_content');
+                if (saved !== null && saved.trim() !== '') {
+                    textarea.value = saved;
+                } else {
+                    textarea.value = DEFAULT_TEXT;
+                }
+            } catch (e) {
+                textarea.value = DEFAULT_TEXT;
+            }
+        }
+
+        copyBtn.addEventListener('click', copyText);
+        saveBtn.addEventListener('click', saveChanges);
+        resetBtn.addEventListener('click', resetToDefault);
+
+        textarea.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveChanges();
+            }
+        });
+
+        loadSavedContent();
+
+        setTimeout(() => {
+            showMessage('📌 برای کپی، دکمه آبی را بزنید');
+        }, 400);
+        setTimeout(() => {
+            if (feedback.textContent === '📌 برای کپی، دکمه آبی را بزنید') {
+                feedback.textContent = '';
+                feedback.className = 'feedback';
+            }
+        }, 3000);
+    })();
+</script>
+
+</body>
+  </html>
